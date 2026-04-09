@@ -4,164 +4,223 @@
 
 <br>
 
-## Introduction
+## Introduccion
 
-[![](https://i.giphy.com/e2AKpOvx2MREY.gif)](https://www.youtube.com/watch?v=04MJIXcZKPk)
+Tenemos hambre de una buena pizza recien hecha. Por supuesto, queremos pedirla online, ya que hablar con una persona solo retrasaria el consumo de pizza.
 
-We have got the munchies for a nice, fresh pie of pizza. Of course, we want to order online. After all, talking to a person will only delay the consumption of pizza.
+Hay un solo problema: el constructor de pizzas de nuestra pizzeria local **no funciona**. Esta vez la pizzeria tiene suerte, porque su cliente de hoy es un desarrollador web. Siempre escuchamos que los desarrolladores deben contribuir a su comunidad. No se me ocurre una contribucion mas significativa que ayudar a la gente a conseguir su pizza mas facilmente.
 
-There is only one problem: our local pizzeria's pizza builder **is not working**. This time, the local pizzeria is in luck because their customer today is a Web developer. We always hear about how developers should give back to their community. I can't think of a more meaningful contribution than helping the community get pizza more easily.
+Tu mision es completar el archivo `js/index.js` para que el constructor de pizzas sea interactivo: los botones deben activar y desactivar ingredientes en la pizza, y el precio debe actualizarse automaticamente.
 
-**You can find a demo of the finished version by clicking [here](https://lab-dom-pizza-builder.surge.sh)**.
+**Puedes ver una demo de la version terminada haciendo clic [aqui](https://lab-dom-pizza-builder.surge.sh)**.
 
-## Requirements
+<br>
 
-- Fork this repo
-- Clone this repo
+## Requisitos
 
-## Submission
+- Haz Fork de este repo
+- Clona este repo
 
-- Upon completion, run the following commands:
+<br>
+
+## Instrucciones de entrega
+
+Una vez completado, ejecuta los siguientes comandos:
 
 ```bash
-$ git add .
-$ git commit -m "Solved lab"
-$ git push origin master
+git add .
+git commit -m "Solved lab"
+git push origin master
 ```
 
-- Create Pull Request so your TAs can check up your work.
+Crea un Pull Request para que tus profesores puedan revisar tu trabajo.
 
 <br>
 
-## Automated Tests
+## Instrucciones
 
-This lab includes an automated testing suite. For DOM-related labs, our automated tests should be seen as a secondary tool, that helps you to programmatically understand whether your solution is correct and allows the educational team to track your progress.
+El proyecto ya tiene toda la estructura HTML y los estilos CSS terminados. Tu unico trabajo es completar el archivo `js/index.js`.
 
-To run the automated tests, please, open your terminal, change directories into the root of the lab, and run `npm install` to install the test runner. Now, you can run the `npm run test:watch` command to run automated tests in watch mode. Open the resulting `lab-solution.html` file with the "Live Server" VSCode extension to always see the most up-to-date test results.
+La pizza se compone de varios ingredientes renderizados con CSS puro. Cada ingrediente es un conjunto de elementos `<section>` dentro de `#pizza`. Los botones del panel de control (`.panel.controls`) permiten activar y desactivar cada ingrediente.
 
-<br>
-
-## Instructions
-
-We will only work with the `js/index.js` file. As you will see, the file contains some code. The file is built to have a [separation of concerns](https://en.wikipedia.org/wiki/Separation_of_concerns) and make the code scalable. This architecture is very close to what you will use with React.
-
-In this architecture, there is a variable `state` with different values, such as `pepperoni` initially set to `true`. When the user clicks on it, the value will be changed to the opposite (example: `false`).
-
-In this architecture, there is also a function `renderEverything` that renders the pizza, the buttons, and the price based on the state. This function should run every time the state is changed, because the pizza, the buttons, and the price must be changed. To give an example, when `state.pepperoni` is `true`, the function will:
-
-- make the pepperoni on the pizza visible,
-- add a class `active` to the "pepperoni" button,
-- update the price panel.
+El enfoque que vas a seguir se llama **estado + renderizado**: defines un objeto JavaScript que representa el estado actual de la pizza, los botones modifican ese estado, y una funcion `renderPizza()` lee el estado y actualiza el DOM para reflejarlo. De esta forma, el estado es la **unica fuente de verdad** de tu aplicacion.
 
 <br>
 
-### Iteration 1: Add and remove toppings
+---
 
-There are five buttons on the left of the pizza builder. Three of those have to add or remove toppings from the pizza. Write the necessary JavaScript for those three buttons to **add and remove pepperoni, mushrooms, and green peppers** from the pizza. **Don't worry about updating the price**. We will do it later.
+### Iteracion 1: El objeto estado y el boton de pepperoni
 
-Each individual topping has its own HTML element.
+#### 1.1 - Define el estado
 
-```html
-<!-- When this button is clicked -->
-<button class="btn btn-pepperoni active">Pepperoni</button>
+Abre `js/index.js`. Veras que ya existe una variable `pizza` declarada como un objeto vacio. Tu primer paso es darle propiedades que representen cada ingrediente de la pizza. Como al cargar la pagina todos los ingredientes estan visibles, todos empiezan en `true`:
 
-<!-- ... -->
-
-<!-- Hide/show all the following sections at the same time -->
-<section class="pep one">1</section>
-<section class="pep two">2</section>
-<!-- ... -->
+```js
+const pizza = {
+  pepperoni: true,
+  mushrooms: true,
+  greenPeppers: true,
+  whiteSauce: true,
+  glutenFreeCrust: true,
+};
 ```
 
-```html
-<!-- When this button is clicked -->
-<button class="btn btn-mushrooms active">Mushrooms</button>
+#### 1.2 - Conecta el boton de pepperoni
 
-<!-- ... -->
+El codigo inicial ya intenta seleccionar el boton de pepperoni. Sin embargo, **revisa con cuidado el selector CSS que se esta usando** y comparalo con la clase real del boton en el HTML. Si algo no coincide, corrigelo.
 
-<!-- Hide/show all the following sections at the same time -->
-<section class="mushroom one">
-  <div class="cap">1</div>
-  <div class="stem"></div>
-</section>
-<section class="mushroom two">
-  <div class="cap">2</div>
-  <div class="stem"></div>
-</section>
-<!-- ... -->
+<details>
+  <summary>Pista</summary>
+
+Abre `index.html` y busca la clase del boton de pepperoni. Comparala con el selector que aparece en `index.js`. Hay un pequeno error tipografico (typo) en el archivo JavaScript que debes corregir.
+
+</details>
+
+Una vez que el selector sea correcto, programa el `onclick` del boton para que:
+
+1. Cambie el valor de `pizza.pepperoni` a su valor contrario (`true` pasa a `false`, y viceversa).
+2. Haga toggle de la clase `active` en el propio boton para que cambie su aspecto visual.
+3. Llame a `renderPizza()`.
+
+#### 1.3 - Implementa `renderPizza()` para el pepperoni
+
+Dentro de `renderPizza()`, selecciona todos los elementos con la clase `.pep` (son las rodajas de pepperoni en el HTML). Recorrelos con un bucle y cambia su `style.visibility`:
+
+- Si `pizza.pepperoni` es `true`, ponles `visibility` a `"visible"`.
+- Si `pizza.pepperoni` es `false`, ponles `visibility` a `"hidden"`.
+
+```js
+// Ejemplo de como ocultar/mostrar un conjunto de elementos:
+const items = document.querySelectorAll(".ejemplo");
+items.forEach(function (item) {
+  item.style.visibility = condicion ? "visible" : "hidden";
+});
 ```
 
-```html
-<!-- When this button is clicked -->
-<button class="btn btn-green-peppers active">Green peppers</button>
-
-<!-- ... -->
-
-<!-- Hide/show all the following sections at the same time -->
-<section class="green-pepper one"></section>
-<section class="green-pepper two"></section>
-<!-- ... -->
-```
-
-**Create the code to hide/show those elements when the buttons are clicked.** For this, you will have to:
-
-- Add click event listener on `<button class="btn btn-mushrooms">` and `<button class="btn btn-green-peppers">` (pepperoni is already done)
-- Write the code for the functions `renderMushrooms()` and `renderGreenPeppers()`
+Prueba tu codigo en el navegador: al hacer clic en el boton de pepperoni, las rodajas deberian aparecer y desaparecer, y el boton deberia cambiar de aspecto.
 
 <br>
 
-### Iteration 2: Sauce and crust options
+---
 
-In this iteration, your goal is to:
+### Iteracion 2: El resto de los toppings
 
-- Add click event listener on `<button class="btn btn-sauce">` and change `state.whiteSauce`
-- Write the function `renderWhiteSauce()`
-- Add click event listener on `<button class="btn btn-crust">` and change `state.glutenFreeCrust`
-- Write the function `renderGlutenFreeCrust()`
+Ahora que tienes el patron funcionando para el pepperoni, aplica la misma logica para los otros dos toppings: **mushrooms** (champiñones) y **green peppers** (pimientos verdes).
 
-As you can see, the initial value for `state.whiteSauce` and `state.glutenFreeCrust` is false. The reason is that, by default, we want a pizza with pepperoni, mushrooms, green peppers but no white sauce nor gluten-free crust.
+#### 2.1 - Boton de mushrooms
 
-For now, **don't worry about updating the price**.
+- Selecciona el boton con la clase `.btn-mushrooms`.
+- En su `onclick`: cambia `pizza.mushrooms`, haz toggle de `active`, llama a `renderPizza()`.
 
-```html
-<!-- Example of a pizza with white-sauce and a gluten-free crust -->
-<section class="crust crust-gluten-free">
-  <section class="cheese"></section>
-  <section class="sauce sauce-white"></section>
-</section>
+#### 2.2 - Boton de green peppers
 
-<!-- Example of a pizza with no white-sauce and no gluten-free crust -->
-<section class="crust">
-  <section class="cheese"></section>
-  <section class="sauce"></section>
-</section>
+- Selecciona el boton con la clase `.btn-green-peppers`.
+- En su `onclick`: cambia `pizza.greenPeppers`, haz toggle de `active`, llama a `renderPizza()`.
+
+#### 2.3 - Extiende `renderPizza()`
+
+Añade la logica para mushrooms y green peppers dentro de `renderPizza()`. Usa el mismo patron que ya tienes para el pepperoni, pero con los selectores correspondientes:
+
+| Ingrediente    | Selector CSS de los elementos |
+| -------------- | ----------------------------- |
+| Pepperoni      | `.pep`                        |
+| Mushrooms      | `.mushroom`                   |
+| Green peppers  | `.green-pepper`               |
+
+Cada grupo de elementos se oculta o muestra con `style.visibility` segun el valor de su propiedad en el estado.
+
+<br>
+
+---
+
+### Iteracion 3: Salsa y masa
+
+Los dos ingredientes restantes funcionan de forma diferente. En lugar de ocultar elementos, lo que hacemos es **añadir o quitar una clase CSS** que cambia su apariencia.
+
+#### 3.1 - Salsa blanca (White sauce)
+
+El elemento de la salsa en el HTML tiene la clase base `.sauce`. Cuando ademas tiene la clase `sauce-white`, se muestra como salsa blanca. Cuando no la tiene, se muestra como salsa roja (la por defecto).
+
+- Selecciona el boton `.btn-sauce`.
+- En su `onclick`: cambia `pizza.whiteSauce`, haz toggle de `active`, llama a `renderPizza()`.
+- En `renderPizza()`: selecciona el elemento `.sauce` y, dependiendo de `pizza.whiteSauce`, añade o quita la clase `sauce-white`.
+
+```js
+// Puedes hacerlo con condicionales:
+if (pizza.whiteSauce) {
+  elemento.classList.add("nombre-clase");
+} else {
+  elemento.classList.remove("nombre-clase");
+}
 ```
 
-<br>
+#### 3.2 - Masa sin gluten (Gluten-free crust)
 
+El elemento `.crust` funciona igual. Cuando tiene la clase `crust-gluten-free`, muestra masa sin gluten. Cuando no la tiene, muestra masa normal.
 
-### Iteration 3: Make the buttons active or not
+- Selecciona el boton `.btn-crust`.
+- En su `onclick`: cambia `pizza.glutenFreeCrust`, haz toggle de `active`, llama a `renderPizza()`.
+- En `renderPizza()`: selecciona el elemento `.crust` y, dependiendo de `pizza.glutenFreeCrust`, añade o quita la clase `crust-gluten-free`.
 
-Currently, all buttons look the same, no matter if the option is activated or not. If you notice, all the buttons have an `active` class.
+<details>
+  <summary>Pista</summary>
 
-```html
-<button class="btn btn-pepperoni active">Pepperoni</button>
+Tambien puedes usar `classList.toggle(className, force)`, donde el segundo parametro es un booleano que indica si la clase debe estar presente (`true`) o ausente (`false`):
+
+```js
+elemento.classList.toggle("mi-clase", condicionBooleana);
 ```
 
-**Write the logic for removing and adding the buttons' `active` class appropriately. Write the code in the function `renderButtons()`**.
+</details>
 
 <br>
 
-### Iteration 4: Ingredients and prices
+---
 
-On the right side of the pizza builder, there is a price section.
+### Iteracion 4: Calculo del precio
 
-Write the function `renderPrice()` that:
+El panel de precios (`.panel.price`) muestra el desglose de lo que cuesta cada ingrediente y el precio total. Necesitas que este panel se actualice dinamicamente segun el estado de la pizza.
 
-- Displays the list of all items selected
-- Displays the total price.
+#### 4.1 - Mostrar/ocultar los precios de cada ingrediente
 
+Selecciona todos los elementos `<li>` dentro de `.panel.price ul`. Cada `<li>` corresponde a un ingrediente, en el mismo orden en que aparecen en el HTML:
+
+| Indice | Ingrediente        | Precio |
+| ------ | ------------------ | ------ |
+| 0      | Pepperoni          | $1     |
+| 1      | Mushrooms          | $1     |
+| 2      | Green peppers      | $1     |
+| 3      | White sauce        | $3     |
+| 4      | Gluten-free crust  | $5     |
+
+Dentro de `renderPizza()`, para cada `<li>`, muestra u oculta el elemento usando `style.display`:
+
+- Si el ingrediente esta activo: `style.display = "inherit"`.
+- Si el ingrediente esta desactivado: `style.display = "none"`.
+
+#### 4.2 - Calcula y muestra el precio total
+
+El precio base de la pizza es siempre **$10** (pizza de queso).
+
+A ese precio, suma el coste de cada ingrediente que este activo:
+
+- Pepperoni: **$1**
+- Mushrooms: **$1**
+- Green peppers: **$1**
+- White sauce: **$3**
+- Gluten-free crust: **$5**
+
+Finalmente, selecciona el elemento `<strong>` dentro de `.panel.price` y actualiza su contenido con el precio total calculado:
+
+```js
+// Ejemplo de como actualizar el texto de un elemento:
+elemento.innerHTML = "$" + precioTotal;
+```
+
+Prueba desactivando y activando ingredientes. El precio total deberia recalcularse correctamente cada vez. Con todos los ingredientes activos, el total es **$21**. Con solo la pizza base (todo desactivado), es **$10**.
 
 <br>
 
-**Happy coding!** 💙
+---
+
+Happy coding! :heart:
